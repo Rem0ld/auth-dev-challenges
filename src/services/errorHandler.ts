@@ -6,29 +6,26 @@ export default (
   res: Response,
   next: NextFunction
 ) => {
+  let status = 500;
+  let message = error.message;
+
+  console.log(error);
+
   if (error.message.includes("exists")) {
-    res.status(409).json(error.message);
-    return;
+    status = 409;
   }
 
   if (error.message.includes("missing")) {
-    res.status(400).json(error.message.replace(/\n/g, " "));
-    return;
-  }
-
-  if (error.message.includes("internal")) {
-    res.status(500).json(error.message);
-    return;
+    status = 400;
   }
 
   if (
     error.message.includes("Invalid or expired") ||
     error.message.includes("invalid token")
   ) {
-    res.status(401).json("jwt invalid or expired");
-    return;
+    status = 401;
+    message = "jwt invalid or expired";
   }
 
-  res.status(500).json(error.message);
-  return;
+  res.status(status).json(message);
 };

@@ -15,16 +15,10 @@ interface IWriter<T> {
   delete(id: number): Promise<void>;
 }
 
-type BaseRepository<T> = IReader<T> & IWriter<T>;
-type Result<T, E> = [T?, E?];
+export type BaseRepository<T> = IReader<T> & IWriter<T>;
+export type Result<T, E> = [T?, E?];
 
-type TResultService<T> = {
+export type TResultService<T> = {
   total: number;
   data: T[];
-};
-
-type TUser = {
-  id: number;
-  email: string;
-  password: string;
 };

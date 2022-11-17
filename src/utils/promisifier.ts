@@ -1,4 +1,8 @@
-export const promisifier = async <T>(promise: any): Promise<[T, any]> => {
+import { Result } from "../global";
+
+export const promisifier = async <T>(
+  promise: any
+): Promise<[T | null, any]> => {
   try {
     const result = await promise;
     return [result, null];
@@ -7,5 +11,5 @@ export const promisifier = async <T>(promise: any): Promise<[T, any]> => {
   }
 };
 
-export const ok = <T, E>(value: T): Result<T, E> => [value, null];
-export const err = <T, E>(error: E): Result<T, E> => [null, error];
+export const ok = <T>(value: T): Result<T, null> => [value, null];
+export const err = <E>(error: E): Result<null, E> => [null, error];
