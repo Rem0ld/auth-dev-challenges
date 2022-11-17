@@ -4,38 +4,43 @@ import {
   Delete,
   Get,
   Post,
+  Put,
 } from "@overnightjs/core";
+import { user } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
-import { baseLimit } from "../../config/constants";
 import errorHandler from "../../services/errorHandler";
+import BaseController from "../../utils/baseController";
 import UserService from "./User.service";
 
 @Controller("api/user")
 @ClassErrorMiddleware(errorHandler)
-export default class UserController {
-  constructor(private service: UserService) {}
+export default class UserController extends BaseController<user> {
+  constructor(service: UserService) {
+    super(service);
+  }
 
   @Get()
-  private async get(req: Request, res: Response, next: NextFunction) {
-    const { limit = baseLimit, skip = 0, ...rest } = req.query;
+  async get(req: Request, res: Response, next: NextFunction) {
+    return super.get(req, res, next);
+  }
 
-    const [result, error] = await this.service.findAll(
-      limit as string,
-      skip as string,
-      rest
-    );
-    if (error) {
-      return next(error);
-    }
-
-    return res.json(result);
+  @Get(":id")
+  async getById(req: Request, res: Response, next: NextFunction) {
+    return super.getById(req, res, next);
   }
 
   @Post()
-  private async post(req: Request, res: Response) {
-    const [result, error] = await this.service.create(req.body);
+  async create(req: Request, res: Response, next: NextFunction) {
+    return super.post(req, res, next);
   }
 
-  @Delete()
-  private async delete(req: Request, res: Response) {}
+  @Put(":id")
+  async update(req: Request, res: Response, next: NextFunction) {
+    return super.update(req, res, next);
+  }
+
+  @Delete(":id")
+  async delete(req: Request, res: Response, next: NextFunction) {
+    return super.delete(req, res, next);
+  }
 }

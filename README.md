@@ -1,3 +1,6 @@
 ## TODO:
- - [x] add basic error handler 
- - [ ] add basic JS in all modules files
+ - add bcrypt for password
+ - handle avatar base64
+ - handle avatar url
+
+ - add auth

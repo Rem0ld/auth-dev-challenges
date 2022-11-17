@@ -1,10 +1,14 @@
 import { user } from "@prisma/client";
-import { Result, TResultService } from "../../global";
+import { IService, Result, TResultService } from "../../global";
 import { err, ok, promisifier } from "../../utils/promisifier";
 import UserRepository from "./User.repository";
 
-export default class UserService {
+export default class UserService implements IService<user> {
   constructor(private repo: UserRepository) {}
+
+  async getCount() {
+    return this.repo.getCount();
+  }
 
   async findAll(limit: string, skip: string, rest?: Record<string, any>) {
     const [result, error] = await promisifier<TResultService<user>>(
@@ -18,27 +22,39 @@ export default class UserService {
     return ok(result);
   }
 
-  async findById(id: number): Promise<Result<user, Error>> {
-    throw new Error("Method not implemented.");
+  async findById(id: string) {
+    const [result, error] = await this.repo.findById(id);
+    if (error) {
+      return err(error);
+    }
+
+    return ok(result);
   }
 
-  async create(data: Partial<user>): Promise<Result<user, Error>> {
-    throw new Error("Method not implemented.");
+  async create(data: Omit<user, "id">) {
+    const [result, error] = await this.repo.create(data);
+    if (error) {
+      return err(error);
+    }
+
+    return ok(result);
   }
 
-  async createMany(data: Partial<user>[]): Promise<user[]> {
-    throw new Error("Method not implemented.");
+  async update(id: string, data: Partial<user>) {
+    const [result, error] = await this.repo.update(id, data);
+    if (error) {
+      return err(error);
+    }
+
+    return ok(result);
   }
 
-  async update(id: number, data: Partial<user>): Promise<user> {
-    throw new Error("Method not implemented.");
-  }
+  async delete(id: string) {
+    const [result, error] = await this.repo.delete(id);
+    if (error) {
+      return err(error);
+    }
 
-  async delete(id: number): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  async getCount(): Promise<number> {
-    throw new Error("Method not implemented.");
+    return ok(result);
   }
 }

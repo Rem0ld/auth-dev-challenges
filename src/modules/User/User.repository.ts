@@ -1,24 +1,55 @@
 import { PrismaClient, user } from "@prisma/client";
-import { BaseRepository, TResultService } from "../../global";
+import { BaseRepository, Result, TResultService } from "../../global";
+import { err, ok, promisifier } from "../../utils/promisifier";
 
 export default class UserRepository implements BaseRepository<user> {
   constructor(private client: PrismaClient) {}
 
-  async create(data: Partial<user>): Promise<user> {
-    throw new Error("Method not implemented.");
-  }
-  async createMany(data: Partial<user>[]): Promise<user[]> {
-    throw new Error("Method not implemented.");
-  }
-  async update(id: number, data: Partial<user>): Promise<user> {
-    throw new Error("Method not implemented.");
-  }
-  async delete(id: number): Promise<void> {
-    throw new Error("Method not implemented.");
+  async getCount(): Promise<number> {
+    return this.client.user.count();
   }
 
-  async getCount(): Promise<number> {
-    throw new Error("Method not implemented.");
+  async create(data: Omit<user, "id">) {
+    const [result, error] = await promisifier<user>(
+      this.client.user.create({
+        data,
+      })
+    );
+    if (error) {
+      return err(new Error(error));
+    }
+
+    return ok(result);
+  }
+
+  async update(id: string, data: Partial<user>) {
+    const [result, error] = await promisifier<user>(
+      this.client.user.update({
+        where: {
+          id,
+        },
+        data,
+      })
+    );
+    if (error) {
+      return err(new Error(error));
+    }
+
+    return ok(result);
+  }
+
+  async delete(id: string): Promise<Result<null, Error>> {
+    const result = await this.client.user.delete({
+      where: {
+        id,
+      },
+    });
+    console.log(result);
+    if (!result) {
+      return err(new Error("Cannot find entry in db"));
+    }
+
+    return ok(null);
   }
 
   async findAll(
@@ -40,7 +71,18 @@ export default class UserRepository implements BaseRepository<user> {
     };
   }
 
-  async findById(id: number): Promise<user> {
-    throw new Error("Method not implemented.");
+  async findById(id: string) {
+    const [user, error] = await promisifier<user>(
+      this.client.user.findFirstOrThrow({
+        where: {
+          id,
+        },
+      })
+    );
+    if (error) {
+      return err(error);
+    }
+
+    return ok(user);
   }
 }

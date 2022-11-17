@@ -19,6 +19,9 @@ export default class MyServer extends Server {
 
   private setupController(): void {
     logger.info("Setting up controllers");
+    routes.forEach(route => {
+      console.log(route);
+    });
     super.addControllers(routes);
   }
 

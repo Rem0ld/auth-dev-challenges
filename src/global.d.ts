@@ -5,18 +5,32 @@ interface IReader<T> {
     skip: number,
     rest?: Record<string, any>
   ): Promise<TResultService<T>>;
-  findById(id: number): Promise<T>;
+  findById(id: string): Promise<Result<T, Error>>;
 }
 
 interface IWriter<T> {
-  create(data: Partial<T>): Promise<T>;
-  createMany(data: Partial<T>[]): Promise<T[]>;
-  update(id: number, data: Partial<T>): Promise<T>;
-  delete(id: number): Promise<void>;
+  create(data: Omit<T, "id">): Promise<Result<T, Error>>;
+  createMany?(data: Partial<T>[]): Promise<T[]>;
+  update(id: string, data: Partial<T>): Promise<Result<T, Error>>;
+  delete(id: string): Promise<Result<null, Error>>;
 }
 
 export type BaseRepository<T> = IReader<T> & IWriter<T>;
-export type Result<T, E> = [T?, E?];
+export interface IService<T> {
+  getCount(): Promise<number>;
+  findAll(
+    limit: string,
+    skip: string,
+    rest?: Record<string, any>
+  ): Promise<Result<TResultService<T>, Error>>;
+  findById(id: string): Promise<any>;
+  create(data: Partial<T>): Promise<Result<T, Error>>;
+  createMany?(data: Partial<T>[]): Promise<T[]>;
+  update(id: string, data: Partial<T>): Promise<Result<T, Error>>;
+  delete(id: string): Promise<Result<null, Error>>;
+}
+
+export type Result<T, E> = [T | null, E | null];
 
 export type TResultService<T> = {
   total: number;
