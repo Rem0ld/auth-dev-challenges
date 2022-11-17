@@ -3,6 +3,7 @@
     "lib": ["ES2020.Intl"],
     "target": "ES6",
     "module": "commonjs",
+    "strict": true,
     "moduleResolution": "node",
     "outDir": "./dist",
     "emitDecoratorMetadata": true,

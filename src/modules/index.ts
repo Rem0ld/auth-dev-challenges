@@ -1,5 +1,5 @@
-import SampleController from "./Sample/index";
+import UserController from "./User/index";
 
-const routes = [SampleController];
+const routes = [UserController];
 
 export default routes;
