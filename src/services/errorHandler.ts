@@ -1,7 +1,11 @@
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from "@prisma/client/runtime";
 import { Request, Response, NextFunction } from "express";
 
 export default (
-  error: Error,
+  error: PrismaClientKnownRequestError,
   req: Request,
   res: Response,
   next: NextFunction
@@ -10,6 +14,16 @@ export default (
   let message = error.message;
 
   console.log(error);
+
+  if (error.code === "P2025") {
+    status = 404;
+    message = "Ressource not found";
+  }
+
+  if (error.code === "P2023") {
+    status = 400;
+    message = "Invalid uuid";
+  }
 
   if (error.message.includes("exists")) {
     status = 409;

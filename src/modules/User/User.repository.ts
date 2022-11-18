@@ -1,4 +1,5 @@
 import { PrismaClient, user } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { BaseRepository, Result, TResultService } from "../../global";
 import { err, ok, promisifier } from "../../utils/promisifier";
 
@@ -39,14 +40,15 @@ export default class UserRepository implements BaseRepository<user> {
   }
 
   async delete(id: string): Promise<Result<null, Error>> {
-    const result = await this.client.user.delete({
-      where: {
-        id,
-      },
-    });
-    console.log(result);
-    if (!result) {
-      return err(new Error("Cannot find entry in db"));
+    const [_, error]: [any, PrismaClientKnownRequestError] = await promisifier(
+      this.client.user.delete({
+        where: {
+          id: id,
+        },
+      })
+    );
+    if (error) {
+      return err(error);
     }
 
     return ok(null);

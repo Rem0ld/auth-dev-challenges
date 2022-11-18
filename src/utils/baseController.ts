@@ -60,6 +60,6 @@ export default class BaseController<T> {
       return next(error);
     }
 
-    return res.json(result);
+    return res.status(204).end();
   }
 }
