@@ -1,6 +1,6 @@
 ## TODO:
- - add bcrypt for password
- - handle avatar base64
- - handle avatar url
+ - [x] add bcrypt for password
+ - handle avatar base64 - encode and decode from front
+ - add zod validation library in TS
 
  - add auth

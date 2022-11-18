@@ -17,10 +17,10 @@ export default class UserRepository implements BaseRepository<user> {
       })
     );
     if (error) {
-      return err(new Error(error));
+      return err(error);
     }
 
-    return ok(result);
+    return ok(result as user);
   }
 
   async update(id: string, data: Partial<user>) {
@@ -33,7 +33,7 @@ export default class UserRepository implements BaseRepository<user> {
       })
     );
     if (error) {
-      return err(new Error(error));
+      return err(error);
     }
 
     return ok(result);
@@ -58,19 +58,24 @@ export default class UserRepository implements BaseRepository<user> {
     limit: number,
     skip: number,
     rest?: Record<string, any>
-  ): Promise<TResultService<user>> {
-    const [count, users] = await this.client.$transaction([
-      this.client.user.count(),
-      this.client.user.findMany({
-        take: limit,
-        skip,
-      }),
-    ]);
+  ): Promise<Result<TResultService<user>, Error>> {
+    const [result, error]: [any, any] = await promisifier(
+      this.client.$transaction([
+        this.client.user.count(),
+        this.client.user.findMany({
+          take: limit,
+          skip,
+        }),
+      ])
+    );
+    if (error) {
+      return err(error);
+    }
 
-    return {
-      data: users,
-      total: count,
-    };
+    return ok({
+      data: result[1],
+      total: result[0],
+    });
   }
 
   async findById(id: string) {

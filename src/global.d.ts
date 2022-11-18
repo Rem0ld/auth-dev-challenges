@@ -4,7 +4,7 @@ interface IReader<T> {
     limit: number,
     skip: number,
     rest?: Record<string, any>
-  ): Promise<TResultService<T>>;
+  ): Promise<Result<TResultService<T>, Error>>;
   findById(id: string): Promise<Result<T, Error>>;
 }
 
@@ -22,11 +22,11 @@ export interface IService<T> {
     limit: string,
     skip: string,
     rest?: Record<string, any>
-  ): Promise<Result<TResultService<T>, Error>>;
-  findById(id: string): Promise<any>;
-  create(data: Partial<T>): Promise<Result<T, Error>>;
-  createMany?(data: Partial<T>[]): Promise<T[]>;
-  update(id: string, data: Partial<T>): Promise<Result<T, Error>>;
+  ): Promise<Result<TResultService<Partial<T>>, Error>>;
+  findById(id: string): Promise<Result<Partial<T>, Error>>;
+  create(data: Partial<T>): Promise<Result<Partial<T>, Error>>;
+  createMany?(data: Partial<T>[]): Promise<Partial<T[]>>;
+  update(id: string, data: Partial<T>): Promise<Result<Partial<T>, Error>>;
   delete(id: string): Promise<Result<null, Error>>;
 }
 

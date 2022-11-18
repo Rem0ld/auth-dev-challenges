@@ -13,7 +13,10 @@ export default (
   let status = 500;
   let message = error.message;
 
+  console.log("==============");
   console.log(error);
+  console.log(error.code);
+  console.log("==============");
 
   if (error.code === "P2025") {
     status = 404;
@@ -23,6 +26,11 @@ export default (
   if (error.code === "P2023") {
     status = 400;
     message = "Invalid uuid";
+  }
+
+  if (error.code === "P2002") {
+    status = 409;
+    message = "email already exists";
   }
 
   if (error.message.includes("exists")) {
