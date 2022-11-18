@@ -5,7 +5,7 @@
   "execMap": {
     "ts": "ts-node"
   },
-  "watch": ["test/fixtures/", "test/samples/", "src", "index.ts"],
+  "watch": ["test/fixtures/", "test/samples/", "src", "index.ts", "docs"],
   "env": {
     "NODE_ENV": "development"
   },

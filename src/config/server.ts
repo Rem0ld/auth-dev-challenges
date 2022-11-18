@@ -1,6 +1,8 @@
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "../../docs/swagger.json";
 
 import { Server } from "@overnightjs/core";
 import { logger } from "../utils/logger/logger";
@@ -15,13 +17,15 @@ export default class MyServer extends Server {
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(morgan("combined"));
     this.setupController();
+    this.app.use(
+      "/api-docs",
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerDocument)
+    );
   }
 
   private setupController(): void {
     logger.info("Setting up controllers");
-    routes.forEach(route => {
-      console.log(route);
-    });
     super.addControllers(routes);
   }
 
