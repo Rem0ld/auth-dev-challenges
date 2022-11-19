@@ -1,10 +1,10 @@
 import { user } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import bcryptjs from "bcryptjs";
-import { IService, Result, TResultService } from "../../global";
-import { err, ok, promisifier } from "../../utils/promisifier";
+import { IService } from "../../global";
+import { err, ok } from "../../utils/promisifier";
 import UserRepository from "./User.repository";
-import { schemaUser, schemaUuid } from "./User.validation";
+import { userSchema, uuidSchema } from "./User.validation";
 
 export default class UserService implements IService<user> {
   constructor(private repo: UserRepository) {}
@@ -49,7 +49,7 @@ export default class UserService implements IService<user> {
   }
 
   async findById(id: string) {
-    const valid = schemaUuid.validate(id);
+    const valid = uuidSchema.validate(id);
     if (valid.error) {
       return err(
         new PrismaClientKnownRequestError("not valid", "P2023", "4.6.1")
@@ -65,7 +65,7 @@ export default class UserService implements IService<user> {
   }
 
   async create(data: Omit<user, "id">) {
-    const valid = schemaUser.validate(data);
+    const valid = userSchema.validate(data);
     console.log(valid);
     if (valid.error) {
       return err(valid.error);
@@ -82,14 +82,14 @@ export default class UserService implements IService<user> {
   }
 
   async update(id: string, data: Partial<user>) {
-    let valid = schemaUuid.validate(id);
+    let valid = uuidSchema.validate(id);
     if (valid.error) {
       return err(
         new PrismaClientKnownRequestError("not valid", "P2023", "4.6.1")
       );
     }
 
-    valid = schemaUser.validate(data);
+    valid = userSchema.validate(data);
     if (valid.error) {
       return err(valid.error);
     }
@@ -107,7 +107,7 @@ export default class UserService implements IService<user> {
   }
 
   async delete(id: string) {
-    const valid = schemaUuid.validate(id);
+    const valid = uuidSchema.validate(id);
     if (valid.error) {
       return err(
         new PrismaClientKnownRequestError("not valid", "P2023", "4.6.1")
