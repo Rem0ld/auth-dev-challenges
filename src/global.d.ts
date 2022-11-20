@@ -1,3 +1,5 @@
+import { user } from "@prisma/client";
+
 interface IReader<T> {
   getCount(): Promise<number>;
   findAll(
@@ -16,6 +18,7 @@ interface IWriter<T> {
 }
 
 export type BaseRepository<T> = IReader<T> & IWriter<T>;
+
 export interface IService<T> {
   getCount(): Promise<number>;
   findAll(
@@ -35,4 +38,12 @@ export type Result<T, E> = [T | null, E | null];
 export type TResultService<T> = {
   total: number;
   data: T[];
+};
+
+export type TProtectedUser = Omit<user, "password">;
+
+export type Tcredentials = {
+  id: string;
+  email: string;
+  password: string;
 };

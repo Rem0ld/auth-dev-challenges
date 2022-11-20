@@ -1,6 +1,11 @@
 import { PrismaClient, user } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
-import { BaseRepository, Result, TResultService } from "../../global";
+import {
+  BaseRepository,
+  Result,
+  Tcredentials,
+  TResultService,
+} from "../../global";
 import { err, ok, promisifier } from "../../utils/promisifier";
 
 export default class UserRepository implements BaseRepository<user> {
@@ -83,6 +88,26 @@ export default class UserRepository implements BaseRepository<user> {
       this.client.user.findFirstOrThrow({
         where: {
           id,
+        },
+      })
+    );
+    if (error) {
+      return err(error);
+    }
+
+    return ok(user);
+  }
+
+  async findByEmail(email: string): Promise<Result<Tcredentials, Error>> {
+    const [user, error] = await promisifier<Tcredentials>(
+      this.client.user.findFirstOrThrow({
+        where: {
+          email,
+        },
+        select: {
+          id: true,
+          email: true,
+          password: true,
         },
       })
     );

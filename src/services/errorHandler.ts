@@ -33,8 +33,8 @@ export default (
     message = "email already exists";
   }
 
-  if (error.message.includes("exists")) {
-    status = 409;
+  if (error.message === "Invalid credentials") {
+    status = 401;
   }
 
   if (error.message.includes("missing")) {

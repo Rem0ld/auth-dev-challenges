@@ -1,12 +1,12 @@
 import { user } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import bcryptjs from "bcryptjs";
-import { IService } from "../../global";
+import { IService, Result, Tcredentials, TProtectedUser } from "../../global";
 import { err, ok } from "../../utils/promisifier";
 import UserRepository from "./User.repository";
 import { userSchema, uuidSchema } from "./User.validation";
 
-export default class UserService implements IService<user> {
+export default class UserService implements IService<TProtectedUser> {
   constructor(private repo: UserRepository) {}
 
   async hashPassword(password: string) {
@@ -31,6 +31,10 @@ export default class UserService implements IService<user> {
     return this.exclude(user, keys);
   }
 
+  async signIn(email: string) {
+    return this.repo.delete;
+  }
+
   async getCount() {
     return this.repo.getCount();
   }
@@ -43,9 +47,15 @@ export default class UserService implements IService<user> {
     }
 
     const protectedUsers = result.data.map(user => this.excludePass(user));
-    result.data = protectedUsers as user[];
 
-    return ok(result);
+    return ok({
+      data: protectedUsers,
+      total: result.total,
+    });
+  }
+
+  async findByEmail(email: string): Promise<Result<Tcredentials, Error>> {
+    return this.repo.findByEmail(email);
   }
 
   async findById(id: string) {
@@ -66,7 +76,7 @@ export default class UserService implements IService<user> {
 
   async create(data: Omit<user, "id">) {
     const valid = userSchema.validate(data);
-    console.log(valid);
+
     if (valid.error) {
       return err(valid.error);
     }
@@ -74,15 +84,16 @@ export default class UserService implements IService<user> {
     data.password = await this.hashPassword(data.password);
 
     const [result, error] = await this.repo.create(data);
-    if (error) {
+    if (error || !result) {
       return err(error);
     }
 
-    return ok(this.excludePass(result as user));
+    return ok(this.excludePass(result));
   }
 
   async update(id: string, data: Partial<user>) {
     let valid = uuidSchema.validate(id);
+
     if (valid.error) {
       return err(
         new PrismaClientKnownRequestError("not valid", "P2023", "4.6.1")
@@ -99,11 +110,11 @@ export default class UserService implements IService<user> {
     }
 
     const [result, error] = await this.repo.update(id, data);
-    if (error) {
+    if (error || !result) {
       return err(error);
     }
 
-    return ok(this.excludePass(result as user));
+    return ok(this.excludePass(result));
   }
 
   async delete(id: string) {
