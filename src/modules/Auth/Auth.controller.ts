@@ -1,11 +1,12 @@
 import {
   Controller,
-  ClassMiddleware,
   ClassErrorMiddleware,
-  Get,
   Post,
+  Middleware,
+  Delete,
 } from "@overnightjs/core";
 import { NextFunction, Request, Response } from "express";
+import getUserFromToken from "../../middlewares/getUserFromToken";
 import errorHandler from "../../services/errorHandler";
 import AuthService from "./Auth.service";
 
@@ -14,13 +15,23 @@ import AuthService from "./Auth.service";
 export default class AuthController {
   constructor(private service: AuthService) {}
 
-  @Get("check-token")
-  private async checkToken(req: Request, res: Response, next: NextFunction) {
-    return res.json("check token");
+  @Delete()
+  @Middleware(getUserFromToken)
+  async logout(req: Request, res: Response, next: NextFunction) {
+    const { userId } = req.params;
+    const [_, error] = await this.service.logOut(
+      userId,
+      req.headers["user-agent"] as string
+    );
+    if (error) {
+      return next(error);
+    }
+
+    return res.status(200).end();
   }
 
   @Post()
-  private async GenerateToken(req: Request, res: Response, next: NextFunction) {
+  async login(req: Request, res: Response, next: NextFunction) {
     const [result, error] = await this.service.signIn(
       req.body,
       req.headers["user-agent"] as string
@@ -29,6 +40,8 @@ export default class AuthController {
       return next(error);
     }
 
-    return res.json("generate toekn");
+    return res.status(200).json({
+      accessToken: result?.accessToken,
+    });
   }
 }

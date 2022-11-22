@@ -1,4 +1,4 @@
-import { Result } from "../../global";
+import { Result, Tcredentials } from "../../global";
 import bcryptjs from "bcryptjs";
 import { ok, err } from "../../utils/promisifier";
 import UserService from "../User/User.service";
@@ -6,9 +6,21 @@ import { user } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import Joi from "joi";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import RefreshTokenService from "../RefreshToken/RefreshToken.service";
 
 export default class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private refreshTokenService: RefreshTokenService
+  ) {}
+
+  createAccessToken(payload: Omit<Tcredentials, "password">): string {
+    const secret = process.env.JWT_SECRET as string;
+
+    return jwt.sign(payload, secret, {
+      expiresIn: "15min",
+    });
+  }
 
   async signIn(
     { email, password }: { email: string; password: string },
@@ -22,7 +34,7 @@ export default class AuthService {
     }
 
     const [result, error] = await this.userService.findByEmail(email);
-    if (error) {
+    if (error || !result) {
       return err(error);
     }
 
@@ -31,16 +43,33 @@ export default class AuthService {
       return err(new Error("Invalid credentials"));
     }
 
-    const payload = {
-      email: result?.email,
-      id: result?.id,
-    };
-    const secret = process.env.JWT_SECRET as string;
-    // We can generate token
-    const accessToken = jwt.sign(payload, secret, {
-      expiresIn: "15min",
-    });
+    const [_, errorRefreshToken] = await this.refreshTokenService.create(
+      result.id,
+      userAgent
+    );
+    if (errorRefreshToken) {
+      console.log(errorRefreshToken);
+    }
 
-    return ok({ accessToken });
+    const payload = {
+      email: result.email,
+      id: result.id,
+    };
+    return ok({ accessToken: this.createAccessToken(payload) });
+  }
+
+  async logOut(
+    userId: string,
+    deviceName: string
+  ): Promise<Result<void, Error>> {
+    const [_, error] = await this.refreshTokenService.delete(
+      userId,
+      deviceName
+    );
+    if (error) {
+      return err(error);
+    }
+
+    return ok(null);
   }
 }

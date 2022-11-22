@@ -2,6 +2,8 @@ import { Result } from "../../global";
 import { err, ok } from "../../utils/promisifier";
 import RefreshTokenRepository from "./RefreshToken.repository";
 import { randomUUID } from "crypto";
+import { uuidSchema } from "../User/User.validation";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 type TDateUnit = "minute" | "hours" | "month";
 
@@ -42,12 +44,11 @@ export default class RefreshTokenService {
       return err(error);
     }
 
-    // Check if token exists and if it's not expired
     if (!result.refreshToken) {
       return ok(false);
     }
-    console.log(result.expiresAt);
-    if (result.expiresAt.toString() > Date.now().toString()) {
+
+    if (Date.now() > new Date(result.expiresAt).getTime()) {
       // It is expired
       return ok(false);
     }
@@ -69,6 +70,21 @@ export default class RefreshTokenService {
       expiresAt,
       refreshToken,
     });
+    if (error) {
+      return err(error);
+    }
+
+    return ok(null);
+  }
+
+  async delete(userId: string, deviceName: string) {
+    const valid = uuidSchema.validate(userId);
+    if (!valid) {
+      return err(
+        new PrismaClientKnownRequestError("not valid", "P2023", "4.6.1")
+      );
+    }
+    const [_, error] = await this.repo.delete(userId, deviceName);
     if (error) {
       return err(error);
     }

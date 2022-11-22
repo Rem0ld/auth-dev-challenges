@@ -1,7 +1,8 @@
-import { Delete, Get, Post, Put } from "@overnightjs/core";
+import { Middleware } from "@overnightjs/core";
 import { NextFunction, Request, Response } from "express";
 import { baseLimit } from "../config/constants";
 import { IService } from "../global";
+import protectRoute from "../middlewares/protectRoutes";
 
 export default class BaseController<T> {
   service;
