@@ -30,7 +30,7 @@ export default class AuthController {
     return res.status(200).end();
   }
 
-  @Post()
+  @Post("login")
   async login(req: Request, res: Response, next: NextFunction) {
     const [result, error] = await this.service.signIn(
       req.body,
@@ -43,5 +43,15 @@ export default class AuthController {
     return res.status(200).json({
       accessToken: result?.accessToken,
     });
+  }
+
+  @Post("register")
+  async register(req: Request, res: Response, next: NextFunction) {
+    const [_, error] = await this.service.register(req.body);
+    if (error) {
+      return next(error);
+    }
+
+    return res.status(200).end();
   }
 }

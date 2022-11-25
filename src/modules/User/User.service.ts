@@ -4,7 +4,7 @@ import bcryptjs from "bcryptjs";
 import { IService, Result, Tcredentials, TProtectedUser } from "../../global";
 import { err, ok } from "../../utils/promisifier";
 import UserRepository from "./User.repository";
-import { userSchema, uuidSchema } from "./User.validation";
+import { registerSchema, userSchema, uuidSchema } from "./User.validation";
 
 export default class UserService implements IService<TProtectedUser> {
   constructor(private repo: UserRepository) {}
@@ -74,8 +74,8 @@ export default class UserService implements IService<TProtectedUser> {
     return ok(this.excludePass(result as user));
   }
 
-  async create(data: Omit<user, "id">) {
-    const valid = userSchema.validate(data);
+  async create(data: Omit<Tcredentials, "id">) {
+    const valid = registerSchema.validate(data);
 
     if (valid.error) {
       return err(valid.error);

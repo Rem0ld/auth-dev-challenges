@@ -7,6 +7,11 @@ export const uuidSchema = joi.string().uuid({
   separator: "-",
 });
 
+export const registerSchema = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().pattern(new RegExp(regExp)).required(),
+});
+
 export const userSchema = joi.object({
   email: joi.string().email().required(),
   password: joi.string().pattern(new RegExp(regExp)).required(),

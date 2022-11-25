@@ -22,6 +22,18 @@ export default class AuthService {
     });
   }
 
+  async register(data: {
+    email: string;
+    password: string;
+  }): Promise<Result<null, Error>> {
+    const [result, error] = await this.userService.create(data);
+    if (error) {
+      return err(error);
+    }
+
+    return ok(null);
+  }
+
   async signIn(
     { email, password }: { email: string; password: string },
     userAgent: string

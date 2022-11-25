@@ -15,8 +15,8 @@ model user {
   email         String          @unique
   password      String
   bio           String?
-  firstname     String
-  lastname      String
+  firstname     String?
+  lastname      String?
   fullname      String?         @default(dbgenerated("GENERATED ALWAYS AS (firstname || ' ' || lastname) STORED"))
   phoneNumber   String?         @map("phone_number")
   avatar        String?

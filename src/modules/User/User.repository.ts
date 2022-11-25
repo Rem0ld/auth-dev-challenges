@@ -15,7 +15,7 @@ export default class UserRepository implements BaseRepository<user> {
     return this.client.user.count();
   }
 
-  async create(data: Omit<user, "id">) {
+  async create(data: Omit<Tcredentials, "id">) {
     const [result, error] = await promisifier<user>(
       this.client.user.create({
         data,

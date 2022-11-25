@@ -25,6 +25,8 @@ export default async function protectRoute(
     jwt.verify(accessToken[1], secret);
   } catch (error: any) {
     if (error?.message.includes("jwt expired")) {
+      console.log("==============");
+      console.log("JWT expired, trying to make a new one from refresh token");
       const [result, error] = await refreshTokenService.findOne(
         decoded?.id,
         req.headers["user-agent"] || ""
@@ -32,11 +34,14 @@ export default async function protectRoute(
       if (error || !result) {
         return res.status(401).json("JWT expired");
       }
+      console.log("Refresh token found, making new Access Token");
 
       const newAccessToken = authService.createAccessToken({
         email: decoded.email,
         id: decoded.id,
       });
+
+      console.log("New access token", newAccessToken);
 
       req.headers.authorization = `Bearer ${newAccessToken}`;
     }
