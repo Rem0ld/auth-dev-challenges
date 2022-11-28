@@ -34,10 +34,10 @@ export default class AuthService {
     return ok(null);
   }
 
-  async signIn(
+  async login(
     { email, password }: { email: string; password: string },
     userAgent: string
-  ): Promise<Result<{ accessToken: string }, Error>> {
+  ): Promise<Result<{ id: string; accessToken: string }, Error>> {
     const emailIsValid = Joi.string().email().validate(email);
     if (!emailIsValid) {
       return err(
@@ -67,10 +67,10 @@ export default class AuthService {
       email: result.email,
       id: result.id,
     };
-    return ok({ accessToken: this.createAccessToken(payload) });
+    return ok({ id: result.id, accessToken: this.createAccessToken(payload) });
   }
 
-  async logOut(
+  async logout(
     userId: string,
     deviceName: string
   ): Promise<Result<void, Error>> {

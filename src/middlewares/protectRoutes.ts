@@ -23,8 +23,10 @@ export default async function protectRoute(
   try {
     const secret = process.env.JWT_SECRET as string;
     jwt.verify(accessToken[1], secret);
-  } catch (error: any) {
-    if (error?.message.includes("jwt expired")) {
+  } catch (e: unknown) {
+    const error = e as Error;
+
+    if (error.message.includes("jwt expired")) {
       console.log("==============");
       console.log("JWT expired, trying to make a new one from refresh token");
       const [result, error] = await refreshTokenService.findOne(
@@ -44,6 +46,10 @@ export default async function protectRoute(
       console.log("New access token", newAccessToken);
 
       req.headers.authorization = `Bearer ${newAccessToken}`;
+      res.cookie("access_token", newAccessToken, {
+        maxAge: 1000 * 60 * 5,
+        httpOnly: true,
+      });
     }
 
     if (error?.message.includes("invalid signature")) {

@@ -19,7 +19,7 @@ export default class AuthController {
   @Middleware(getUserFromToken)
   async logout(req: Request, res: Response, next: NextFunction) {
     const { userId } = req.params;
-    const [_, error] = await this.service.logOut(
+    const [_, error] = await this.service.logout(
       userId,
       req.headers["user-agent"] as string
     );
@@ -32,7 +32,7 @@ export default class AuthController {
 
   @Post("login")
   async login(req: Request, res: Response, next: NextFunction) {
-    const [result, error] = await this.service.signIn(
+    const [result, error] = await this.service.login(
       req.body,
       req.headers["user-agent"] as string
     );
@@ -40,9 +40,7 @@ export default class AuthController {
       return next(error);
     }
 
-    return res.status(200).json({
-      accessToken: result?.accessToken,
-    });
+    return res.status(200).json(result);
   }
 
   @Post("register")

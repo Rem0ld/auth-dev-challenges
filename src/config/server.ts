@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "../../docs/swagger.json";
 
@@ -16,6 +17,7 @@ export default class MyServer extends Server {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(morgan("combined"));
+    this.app.use(cors());
     this.setupController();
     this.app.use(
       "/api-docs",
@@ -26,9 +28,6 @@ export default class MyServer extends Server {
 
   private setupController(): void {
     logger.info("Setting up controllers");
-    routes.forEach(route => {
-      console.log(route);
-    });
     super.addControllers(routes);
   }
 

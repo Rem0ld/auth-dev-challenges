@@ -33,8 +33,15 @@ export default class RefreshTokenRepository {
 
   async create(data: Omit<refresh_token, "id">) {
     const [result, error] = await promisifier<refresh_token>(
-      this.client.refresh_token.create({
-        data,
+      this.client.refresh_token.upsert({
+        where: {
+          userId_device: {
+            userId: data.userId,
+            device: data.device,
+          },
+        },
+        create: data,
+        update: data,
       })
     );
     if (error) {
