@@ -29,10 +29,13 @@ export default async function protectRoute(
     if (error.message.includes("jwt expired")) {
       console.log("==============");
       console.log("JWT expired, trying to make a new one from refresh token");
+      console.log("decoded id", decoded.id);
+      console.log("User agent", req.headers["user-agent"]);
       const [result, error] = await refreshTokenService.findOne(
         decoded?.id,
         req.headers["user-agent"] || ""
       );
+      console.log(result);
       if (error || !result) {
         return res.status(401).json("JWT expired");
       }

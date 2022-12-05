@@ -75,7 +75,6 @@ export default class RefreshTokenRepository {
   }
 
   async delete(userId: string, deviceName: string) {
-    console.log(userId, deviceName);
     const [_, error] = await promisifier(
       this.client.refresh_token.delete({
         where: {
